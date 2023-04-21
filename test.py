@@ -3,12 +3,14 @@ import pandas as pd
 from matplotlib.patches import ConnectionPatch
 import math
 import random
+import copy
+from itertools import permutations, combinations_with_replacement
 
 
-class Node:
-    def __init__(self, data, next):
-        self.data = data
-        self.next = None
+# class Node:
+#     def __init__(self, data, next):
+#         self = data
+#         self.next = None
 
 
 df = pd.read_csv('train_distance_matrix.csv')
@@ -39,7 +41,7 @@ def randomValues(numOfRows, arr):
 
 # Change this to change how many points we see on graph
 #######################################################
-numberOfDestinationsToCompare = 4
+numberOfDestinationsToCompare = 8
 #######################################################
 
 # Change this to randomize points on graph
@@ -90,17 +92,23 @@ for i in range(numberOfDestinationsToCompare):
 for i in range(len(points)):
     ax1.plot(points[i][0], points[i][1], markerfacecolor=colors[i],
              marker='o', markeredgecolor=colors[i])
+    if i == 0:
+        ax1.annotate('Start', [points[i][0], points[i][1]])
 
 uuid = 1
 tempId = 1
-nodes = []
+nodes = {}
 for i in range(len(points)):
     data = {
         'id': uuid,
         'color': colors[i],
-        'connectedNodes': []
+        'connectedNodes': {}
     }
-    node = Node(data, None)
+    node = {
+        'id': uuid,
+        'color': colors[i],
+        'connectedNodes': {}
+    }
     for coords in points:
         # NOTE: might act weird if there are same values in array -- whichever comes 1st might bring by index
         if points.index(coords) == i:
@@ -114,11 +122,12 @@ for i in range(len(points)):
         currentNode = {
             # What node this node is looking at
             'distanceBetween': distanceBetween,
-            'uuid': tempId,
-            'color': colors[tempId - 1]
+            'id': tempId,
+            'color': colors[tempId - 1],
+            'visited': {}
         }
 
-        node.data['connectedNodes'].append(currentNode)
+        node['connectedNodes'][tempId] = currentNode
         midpoint_X = (coords[0] + points[i][0]) / 2
         midpoint_Y = (coords[1] + points[i][1]) / 2
         con1 = ConnectionPatch(xyA=points[i], xyB=coords, coordsA="data",
@@ -129,9 +138,105 @@ for i in range(len(points)):
 
     uuid += 1
     tempId = 1
-    nodes.append(node)
+    nodes[node['id']] = node
 
-for node in nodes:
-    print(node.data)
 
+
+# worst = None
+# best = None
+# for i in range(len(nodes[0]['connectedNodes'])):
+#     node = nodes[0]['connectedNodes'][i]
+#     startId = nodes[0]['id']
+#     for inner in nodes[i]['connectedNodes']:
+#         current = node['distanceBetween']
+#         addString = ''
+
+#         addString += f'{current}'
+
+#         if inner['id'] == node['id']:
+#             continue
+#         if inner['id'] == startId:
+#             continue
+#         for each in nodes:
+#             if each['id'] == inner['id']:
+#                 for distance in each['connectedNodes']:
+#                     if distance['id'] == node['id'] and distance['id'] != startId:
+#                         addString += f" + {distance['distanceBetween']}"
+#                         current += distance['distanceBetween']
+
+#         print(addString)
+#         if worst == None or current > worst:
+#             worst = current
+#         if best == None or current < best:
+#             best = current
+
+
+# count = 0
+# reset = False
+# def dfs(graph, node, ogCount):
+#     for each in node['connectedNodes'].keys():
+#         if node['id'] not in node[each]['visited']:
+#             for i in graph.keys():
+#                 graph[i]['connectedNodes'][node['each']]['visited'][node['id']] = True
+#             count += node[each]['distanceBetween']
+
+
+# worst = None
+# best = None
+# starterId = nodes.keys()[0]['id']
+# for key in nodes[starterId]['connectedNodes'].keys():
+#     copied = copy.deepcopy(nodes[1:])
+#     firstRelation = copied[key]['connectedNodes'][starterId]
+#     count += firstRelation['distanceBetween']
+#     for kill in copied.keys():
+#         for j in copied.keys():
+#             kill['connectedNodes'][starterId]['visited'][j] = True
+#     ogCount = count
+#     dfs(copied, copied[key], ogCount)
+#     if worst == None or count > worst:
+#         worst = count
+#     if best == None or count < best:
+#         best = count
+#     count = 0
+
+combos = {}
+permutation = permutations(list(nodes.keys())[1:], len(nodes.keys()) - 1)
+index = 0
+for comb in permutation:
+    build = {'1': '1'}
+    for i in range(len(comb)):
+        build[str(comb[i])] = str(comb[i])
+    combos[index] = build
+    index += 1
+
+print(nodes)
+# print(range(len(combos.keys())))
+counts = []
+for i in range(len(combos.keys())):
+    count = 0
+    print(combos[i].keys())
+    indexCount = 0
+    for key in combos[i].keys():
+        nextIndex = list(combos[i].keys()).index(key) + 1
+        #  in nodes[int(key)]['connectedNodes']
+        if len(list(combos[i])) > nextIndex:
+            print(len(list(combos[i])))
+            print(nextIndex)
+            # print(nodes[int(key)]['connectedNodes'])
+            count += nodes[int(key)]['connectedNodes'][int(list(combos[i])[nextIndex])]['distanceBetween']
+        indexCount += 1
+    counts.append(count)
+
+print(counts)
+best = None
+worst = None
+for count in counts:
+    if best == None or count < best:
+        best = count
+    if worst == None or count > worst:
+        worst = count
+
+
+print('Best case: ', best)
+print('Worst case: ', worst)
 plt.show()

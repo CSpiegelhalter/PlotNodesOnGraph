@@ -1,3 +1,2 @@
-ndex(coords) == i:
-        #     continue
-            
+)
+            # print(nodes[int(k

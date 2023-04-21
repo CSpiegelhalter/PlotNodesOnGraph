@@ -1,0 +1,3 @@
+ndex(coords) == i:
+        #     continue
+            

@@ -1,2 +1,1 @@
-)
-            # print(nodes[int(k
+sumOfSquaredValues

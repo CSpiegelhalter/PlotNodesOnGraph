@@ -40,10 +40,9 @@ numberOfDestinationsToCompare = 4
 
 # Change this to randomize points on graph
 #######################################################
-randomize = True
 #######################################################
 
-if randomize:
+if randomize := True:
     pickup_longitude = df['pickup_longitude'].to_list()
     pickup_latitude = df['pickup_latitude'].to_list()
     randomLongitudes = randomValues(

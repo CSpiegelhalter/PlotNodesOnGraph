@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.patches import ConnectionPatch
 import math
-import random
 from itertools import permutations
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import silhouette_score
 import numpy as np
+import secrets
 
 
 
@@ -19,7 +19,7 @@ def getRandomNumber():
     haveNotFoundUniqueRandomNumber = True
     while(haveNotFoundUniqueRandomNumber):
         # We have 30,000+ rows in the dataset
-        number = random.randint(0, 30000)
+        number = secrets.SystemRandom().randint(0, 30000)
         if number not in seenRandomValues:
             seenRandomValues.append(number)
             haveNotFoundUniqueRandomNumber = False
@@ -67,7 +67,7 @@ seenColors = []
 def getRandomColors():
     haveNotFoundUniqueRandomNumber = True
     while(haveNotFoundUniqueRandomNumber):
-        def r(): return random.randint(0, 255)
+        def r(): return secrets.SystemRandom().randint(0, 255)
         if r not in seenColors:
             seenColors.append(r)
             haveNotFoundUniqueRandomNumber = False
